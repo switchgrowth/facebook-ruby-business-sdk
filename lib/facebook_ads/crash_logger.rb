@@ -13,6 +13,7 @@ module FacebookAds
       private
       @@enabled = false
       @@hasRegisteredCrashBlock = false
+      @@crash_mutex = Mutex.new
 
       def logCrash
         error = $!
@@ -101,20 +102,20 @@ module FacebookAds
       public
       # Enable crash reporting
       def enable
-        if !@@hasRegisteredCrashBlock then
-          at_exit do
-            completion()
+        @@crash_mutex.synchronize do
+          unless @@hasRegisteredCrashBlock
+            at_exit { completion() }
+            @@hasRegisteredCrashBlock = true
           end
-
-          @@hasRegisteredCrashBlock = true
+          @@enabled = true
         end
-
-        @@enabled = true
       end
 
       # Disable crash reporting
       def disable
-        @@enabled = false
+        @@crash_mutex.synchronize do
+          @@enabled = false
+        end
       end
     end
   end

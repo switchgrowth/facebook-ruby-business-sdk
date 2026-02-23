@@ -8,15 +8,19 @@ require 'facebook_ads/field_types/base'
 
 module FacebookAds
   module FieldTypes
+    REGISTRY_MUTEX = Mutex.new
+    REGISTRY = {}
+
     def register(*type_names)
-      @@registry ||= {}
-      type_names.each do |type_name|
-        @@registry[type_name] = self
+      REGISTRY_MUTEX.synchronize do
+        type_names.each do |type_name|
+          REGISTRY[type_name] = self
+        end
       end
     end
 
     def lookup(type_name)
-      @@registry && @@registry[type_name]
+      REGISTRY[type_name]
     end
 
     def for(type_spec)

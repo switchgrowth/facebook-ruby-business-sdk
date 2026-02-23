@@ -22,8 +22,12 @@ module FacebookAds
     Session.current_session = original_session
   end
 
+  @config_mutex = Mutex.new
+
   def configure
-    @config ||= Config.new
+    @config_mutex.synchronize do
+      @config ||= Config.new
+    end
     yield @config if block_given?
     CrashLogger.enable if @config.crash_logging_enabled
     @config
