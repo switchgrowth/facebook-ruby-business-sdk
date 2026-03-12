@@ -52,23 +52,32 @@ module FacebookAds
   require 'facebook_ads/batch_api/batch'
   require 'facebook_ads/batch_api/batch_proxy'
 
-  # Autoload Ad Objects Helpers
+  # Register autoloads for Ad Object Helpers
   Dir.glob(File.expand_path(File.join(__FILE__, '..', 'facebook_ads', 'ad_objects', 'helpers', '*.rb'))).each do |file|
     class_name = File.basename(file, '.rb').split('_').map(&:capitalize).join.to_sym
     autoload class_name, file
   end
 
-  # Autoload AdObjects
+  # Register autoloads for Ad Objects
   Dir.glob(File.expand_path(File.join(__FILE__, '..', 'facebook_ads', 'ad_objects', '*.rb'))).each do |file|
     class_name = File.basename(file, '.rb').split('_').map(&:capitalize).join.to_sym
     autoload class_name, file
   end
 
   module ServerSide
-    # Autoload Server-Side API
+    # Register autoloads for Server-Side API
     Dir.glob(File.expand_path(File.join(__FILE__, '..', 'facebook_ads', 'ad_objects', 'server_side', '*.rb'))).each do |file|
       class_name = File.basename(file, '.rb').split('_').map(&:capitalize).join.to_sym
       autoload class_name, file
     end
+  end
+
+  # Eagerly load all autoloaded constants to avoid thread-safety issues
+  constants.each do |const_name|
+    const_get(const_name) if autoload?(const_name)
+  end
+
+  ServerSide.constants.each do |const_name|
+    ServerSide.const_get(const_name) if ServerSide.autoload?(const_name)
   end
 end
