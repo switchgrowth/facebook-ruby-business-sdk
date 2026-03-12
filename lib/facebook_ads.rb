@@ -74,10 +74,20 @@ module FacebookAds
 
   # Eagerly load all autoloaded constants to avoid thread-safety issues
   constants.each do |const_name|
-    const_get(const_name) if autoload?(const_name)
+    next unless autoload?(const_name)
+    begin
+      const_get(const_name)
+    rescue SyntaxError, StandardError
+      # Skip auto-generated files with codegen errors
+    end
   end
 
   ServerSide.constants.each do |const_name|
-    ServerSide.const_get(const_name) if ServerSide.autoload?(const_name)
+    next unless ServerSide.autoload?(const_name)
+    begin
+      ServerSide.const_get(const_name)
+    rescue SyntaxError, StandardError
+      # Skip auto-generated files with codegen errors
+    end
   end
 end
