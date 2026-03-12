@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## v24.0..3
+- General thread safety changes
+
+## v24.0.2
+### Changed
+- CI fixes
+- Ruby version bumps and changes
+- Internal object ID method names
+
 ## v24.0.1
 ### Added
 - Add additional AMM fields: attribution_method, decline_reason, auditing_token, linkage_key

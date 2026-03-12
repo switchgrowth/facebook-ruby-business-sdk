@@ -62,28 +62,34 @@ module FacebookAds
       "https://#{self.server_host}/#{self.api_version}/".freeze
     end
 
+    @default_session_mutex = Mutex.new
+
     class << self
       def anonymous_session
         new()
       end
 
       def default_session
-        # TODO
-        @default_session ||= new( access_token: FacebookAds.config.access_token,
-                                  app_secret: FacebookAds.config.app_secret)
+        @default_session_mutex.synchronize do
+          @default_session ||= new(
+            access_token: FacebookAds.config.access_token,
+            app_secret: FacebookAds.config.app_secret
+          )
+        end
       end
 
       def default_session=(session)
-        # TODO
-        @default_session = session
+        @default_session_mutex.synchronize do
+          @default_session = session
+        end
       end
 
       def current_session
-        @@current_session ||= default_session
+        Thread.current[:facebook_ads_current_session] || default_session
       end
 
       def current_session=(session)
-        @@current_session = session
+        Thread.current[:facebook_ads_current_session] = session
       end
     end
   end

@@ -55,7 +55,13 @@ module FacebookAds
     end
 
     class << self
-      attr_accessor :current_batch
+      def current_batch
+        Thread.current[:facebook_ads_current_batch]
+      end
+
+      def current_batch=(batch)
+        Thread.current[:facebook_ads_current_batch] = batch
+      end
 
       def with_batch
         new.tap do |current_batch|
